@@ -1,0 +1,53 @@
+from uuid import UUID
+
+AddOption(
+    "--uuid",
+    dest="uuid",
+    type="string",
+    nargs=1,
+    action="store",
+    help="UUID of the device",
+    default="00000000-0000-0000-0000-000000000000",
+)
+
+name = "optikos"
+uuid = UUID(GetOption("uuid"))
+
+
+env = Environment(
+    CC="avr-gcc",
+    OBJCOPY="avr-objcopy",
+    OBJDUMP="avr-objdump",
+    CCFLAGS=[
+        "-Os",
+        "-Wall",
+        "-Wextra",
+        "-std=c11",
+        "-mmcu=atmega32u4",
+    ],
+    LINKFLAGS=[
+        "-Os",
+        "-mmcu=atmega32u4",
+    ],
+    CPPDEFINES={
+        "F_CPU": '16000000UL',
+    },
+    BUILDERS={
+        "Hex": Builder(
+            action="$OBJCOPY -j .text -j .data -O ihex $SOURCE $TARGET",
+            suffix=".hex",
+            single_source=True,
+        ),
+        "Asm": Builder(
+            action="$OBJDUMP -S --disassemble $SOURCE > $TARGET",
+            suffix=".asm",
+            single_source=True,
+        ),
+    },
+    PROGSUFFIX=".elf",
+)
+
+elf = env.Program(name, [env.Object(s) for s in env.Glob("*.c")])
+
+env.Hex(elf)
+env.Asm(elf)
