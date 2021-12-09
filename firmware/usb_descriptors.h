@@ -8,6 +8,11 @@ extern configuration_descriptor_t configuration_descriptor;
 
 extern interface_association_descriptor_t interface_association_descriptor;
 
+extern interface_descriptor_t video_control_interface_descriptor;
+
+extern video_control_interface_descriptor_header_t
+    video_control_interface_descriptor_header;
+
 extern string_descriptor_t string_descriptor_zero;
 
 extern string_descriptor_t string_descriptor_one;

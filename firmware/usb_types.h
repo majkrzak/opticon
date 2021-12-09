@@ -105,10 +105,22 @@ typedef struct USB_STRUCT {
   uint8_t bInterfaceNumber;
   uint8_t bAlternateSetting;
   uint8_t bNumEndpoints;
+  uint8_t bInterfaceClass;
   uint8_t bInterfaceSubClass;
   uint8_t bInterfaceProtocol;
   uint8_t iInterface;
 } interface_descriptor_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bDescriptorSubType;
+  uint16_t bcdUVC;
+  uint16_t wTotalLength;
+  uint32_t dwClockFrequency;
+  uint8_t bInCollection;
+  uint8_t baInterfaceNr[1];
+} video_control_interface_descriptor_header_t;
 
 typedef struct USB_STRUCT {
   uint8_t bLength;

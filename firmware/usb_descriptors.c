@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+// 3.2 Device Descriptor
 device_descriptor_t device_descriptor = {
     .bLength = sizeof(device_descriptor_t),
     .bDescriptorType = DEVICE_DESCRIPTOR,
@@ -20,10 +21,12 @@ device_descriptor_t device_descriptor = {
     .bNumConfigurations = 1,
 };
 
+// 3.4 Configuration Descriptor
 configuration_descriptor_t configuration_descriptor = {
     .bLength = sizeof(configuration_descriptor_t),
     .bDescriptorType = CONFIGURATION_DESCRIPTOR,
-    .wTotalLength = sizeof(configuration_descriptor_t),
+    .wTotalLength =
+        sizeof(configuration_descriptor_t), // TODO calculate properly!
     .bNumInterfaces = 0,
     .bConfigurationValue = 1,
     .iConfiguration = 1,
@@ -31,15 +34,42 @@ configuration_descriptor_t configuration_descriptor = {
     .bMaxPower = 250,
 };
 
+// 3.6 Interface Association Descriptor
 interface_association_descriptor_t interface_association_descriptor = {
     .bLength = sizeof(interface_association_descriptor_t),
     .bDescriptorType = INTERFACE_ASSOCIATION_DESCRIPTOR,
-    .bFirstInterface = 1,
+    .bFirstInterface = 0,
     .bInterfaceCount = 2,
     .bFunctionClass = CC_VIDEO,
     .bFunctionSubClass = SC_VIDEO_INTERFACE_COLLECTION,
     .bFunctionProtocol = PC_PROTOCOL_UNDEFINED,
     .iFunction = 1,
+};
+
+// 3.7.1 Standard VC Interface Descriptor
+interface_descriptor_t video_control_interface_descriptor = {
+    .bLength = sizeof(interface_descriptor_t),
+    .bDescriptorType = INTERFACE_DESCRIPTOR,
+    .bInterfaceNumber = 0,
+    .bAlternateSetting = 0,
+    .bNumEndpoints = 0,
+    .bInterfaceClass = CC_VIDEO,
+    .bInterfaceSubClass = SC_VIDEOCONTROL,
+    .bInterfaceProtocol = PC_PROTOCOL_15,
+    .iInterface = 1,
+};
+
+// 3.7.2 Class-Specific VC Interface Descriptor
+video_control_interface_descriptor_header_t
+    video_control_interface_descriptor_header = {
+        .bLength = sizeof(video_control_interface_descriptor_header_t),
+        .bDescriptorType = CS_INTERFACE,
+        .bDescriptorSubType = VC_HEADER,
+        .bcdUVC = 0x150,
+        .wTotalLength = 0, // TODO calculate properly!
+        .dwClockFrequency = F_CPU,
+        .bInCollection = 1,
+        .baInterfaceNr = {1},
 };
 
 string_descriptor_t string_descriptor_zero = {
