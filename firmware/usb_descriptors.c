@@ -96,11 +96,100 @@ streaming_terminal_descriptor_t streaming_terminal_descriptor = {
     .bLength = sizeof streaming_terminal_descriptor,
     .bDescriptorType = CS_INTERFACE,
     .bDescriptorSubType = VC_OUTPUT_TERMINAL,
-    .bTerminalID = 3,
+    .bTerminalID = 2,
     .wTerminalType = TT_STREAMING,
     .bAssocTerminal = 0,
     .bSourceID = 1,
     .iTerminal = 1,
+};
+
+interface_descriptor_t video_streaming_interface_descriptor = {
+    .bLength = sizeof video_streaming_interface_descriptor,
+    .bDescriptorType = INTERFACE_DESCRIPTOR,
+    .bInterfaceNumber = 1,
+    .bAlternateSetting = 0,
+    .bNumEndpoints = 0, // TODO temporarly
+    .bInterfaceClass = CC_VIDEO,
+    .bInterfaceSubClass = SC_VIDEOSTREAMING,
+    .bInterfaceProtocol = PC_PROTOCOL_15,
+    .iInterface = 1,
+};
+
+// 3.9.2.1 Input Header Descriptor
+video_streaming_interface_descriptor_header_t
+    video_streaming_interface_descriptor_header = {
+        .bLength = sizeof video_streaming_interface_descriptor_header,
+        .bDescriptorType = CS_INTERFACE,
+        .bDescriptorSubtype = VS_INPUT_HEADER,
+        .bNumFormats = 1,
+        .wTotalLength = 0, // TODO calculate properly!
+        .bEndpointAddress =
+            {
+                .direction = IN,
+                .number = 1,
+            },
+        .bmInfo =
+            {
+                .dynamic_format_change = OFF,
+            },
+        .bTerminalLink = 2,
+        .bStillCaptureMethod = 0,
+        .bTriggerSupport = 0,
+        .bTriggerUsage = 0,
+        .bControlSize = 0,
+};
+
+uncompressed_video_format_descriptor_t uncompressed_video_format_descriptor = {
+    .bLength = sizeof uncompressed_video_format_descriptor,
+    .bDescriptorType = CS_INTERFACE,
+    .bDescriptorSubtype = VS_FORMAT_UNCOMPRESSED,
+    .bFormatIndex = 1,
+    .bNumFrameDescriptors = 1,
+    .guidFormat = {},
+    .bBitsPerPixel = 8,      // TODO
+    .bDefaultFrameIndex = 0, // TODO dunno
+    .bAspectRatioX = 1,
+    .bAspectRatioY = 1,
+    .bmInterlaceFlags = 0, // TODO ensure
+    .bCopyProtect = 0,
+};
+
+uncompressed_video_frame_descriptor_t uncompressed_video_frame_descriptor = {
+    .bLength = sizeof uncompressed_video_frame_descriptor,
+    .bDescriptorType = CS_INTERFACE,
+    .bDescriptorSubtype = VS_FRAME_UNCOMPRESSED,
+    .bFrameIndex = 1,
+    .bmCapabilities =
+        {
+            .still_image_supported = OFF,
+            .fixed_frame_rate = ON,
+        },
+    .wWidth = 16,
+    .wHeight = 16,
+    .dwMinBitRate = 512ul * 512ul, // TODO calculate
+    .dwMaxBitRate = 512ul * 512ul,
+    .dwMaxVideoFrameBufferSize = 16 * 16 * 3,
+    .dwDefaultFrameInterval = 1000000,
+    .bFrameIntervalType = 0,
+    .dwMinFrameInterval = 1000000,
+    .dwMaxFrameInterval = 1000000,
+    .dwFrameIntervalStep = 0,
+};
+
+endpoint_descriptor_t video_streaming_endpoint_descriptor = {
+    .bLength = sizeof video_streaming_endpoint_descriptor,
+    .bDescriptorType = ENDPOINT_DESCRIPTOR,
+    .bEndpointAddress =
+        {
+            .direction = IN,
+            .number = 1,
+        },
+    .bmAttributes =
+        {
+            .transfer_type = BULK,
+        },
+    .wMaxPacketSize = 64, // TODO fixme
+    .bInterval = 100,
 };
 
 string_descriptor_t string_descriptor_zero = {

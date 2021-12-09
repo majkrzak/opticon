@@ -17,6 +17,19 @@ extern camera_terminal_descriptor_t camera_terminal_descriptor;
 
 extern streaming_terminal_descriptor_t streaming_terminal_descriptor;
 
+extern interface_descriptor_t video_streaming_interface_descriptor;
+
+extern video_streaming_interface_descriptor_header_t
+    video_streaming_interface_descriptor_header;
+
+extern uncompressed_video_format_descriptor_t
+    uncompressed_video_format_descriptor;
+
+extern uncompressed_video_frame_descriptor_t
+    uncompressed_video_frame_descriptor;
+
+extern endpoint_descriptor_t video_streaming_endpoint_descriptor;
+
 extern string_descriptor_t string_descriptor_zero;
 
 extern string_descriptor_t string_descriptor_one;

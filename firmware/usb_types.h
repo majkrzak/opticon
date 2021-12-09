@@ -5,6 +5,20 @@
 #define USB_STRUCT                                                             \
   __attribute__((packed, scalar_storage_order("little-endian")))
 
+typedef enum {
+  OFF = 0,
+  ON = 1,
+} on_off_t;
+
+typedef struct USB_STRUCT {
+  uint8_t number : 4;
+  uint8_t _ : 3;
+  enum {
+    OUT = 0,
+    IN = 1,
+  } direction : 1;
+} endpoint_address_t;
+
 typedef struct {
   struct {
     enum {
@@ -96,8 +110,13 @@ typedef struct USB_STRUCT {
 typedef struct USB_STRUCT {
   uint8_t bLength;
   uint8_t bDescriptorType;
-  uint16_t bString[];
-} string_descriptor_t;
+  uint8_t bFirstInterface;
+  uint8_t bInterfaceCount;
+  uint8_t bFunctionClass;
+  uint8_t bFunctionSubClass;
+  uint8_t bFunctionProtocol;
+  uint8_t iFunction;
+} interface_association_descriptor_t;
 
 typedef struct USB_STRUCT {
   uint8_t bLength;
@@ -151,14 +170,62 @@ typedef struct USB_STRUCT {
 typedef struct USB_STRUCT {
   uint8_t bLength;
   uint8_t bDescriptorType;
+  uint8_t bDescriptorSubtype;
+  uint8_t bNumFormats;
+  uint16_t wTotalLength;
+  endpoint_address_t bEndpointAddress;
   struct {
-    uint8_t number : 4;
-    uint8_t _ : 3;
-    enum {
-      OUT = 0,
-      IN = 1,
-    } direction : 1;
-  } bEndpointAddress;
+    on_off_t dynamic_format_change : 1;
+    uint8_t _ : 7;
+  } bmInfo;
+  uint8_t bTerminalLink;
+  uint8_t bStillCaptureMethod;
+  uint8_t bTriggerSupport;
+  uint8_t bTriggerUsage;
+  uint8_t bControlSize;
+} video_streaming_interface_descriptor_header_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bDescriptorSubtype;
+  uint8_t bFormatIndex;
+  uint8_t bNumFrameDescriptors;
+  uint8_t guidFormat[16];
+  uint8_t bBitsPerPixel;
+  uint8_t bDefaultFrameIndex;
+  uint8_t bAspectRatioX;
+  uint8_t bAspectRatioY;
+  uint8_t bmInterlaceFlags;
+  uint8_t bCopyProtect;
+} uncompressed_video_format_descriptor_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bDescriptorSubtype;
+  uint8_t bFrameIndex;
+  struct {
+    on_off_t still_image_supported : 1;
+    on_off_t fixed_frame_rate : 1;
+    uint8_t _ : 6;
+  } bmCapabilities;
+  uint16_t wWidth;
+  uint16_t wHeight;
+  uint32_t dwMinBitRate;
+  uint32_t dwMaxBitRate;
+  uint32_t dwMaxVideoFrameBufferSize;
+  uint32_t dwDefaultFrameInterval;
+  uint8_t bFrameIntervalType;
+  uint32_t dwMinFrameInterval;
+  uint32_t dwMaxFrameInterval;
+  uint32_t dwFrameIntervalStep;
+} uncompressed_video_frame_descriptor_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  endpoint_address_t bEndpointAddress;
   struct {
     enum {
       CONTROL = 0,
@@ -185,13 +252,8 @@ typedef struct USB_STRUCT {
 typedef struct USB_STRUCT {
   uint8_t bLength;
   uint8_t bDescriptorType;
-  uint8_t bFirstInterface;
-  uint8_t bInterfaceCount;
-  uint8_t bFunctionClass;
-  uint8_t bFunctionSubClass;
-  uint8_t bFunctionProtocol;
-  uint8_t iFunction;
-} interface_association_descriptor_t;
+  uint16_t bString[];
+} string_descriptor_t;
 
 enum {
   CC_MISCELLANEOUS = 0xEF,
