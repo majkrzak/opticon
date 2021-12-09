@@ -23,10 +23,9 @@ device_descriptor_t device_descriptor = {
 
 // 3.4 Configuration Descriptor
 configuration_descriptor_t configuration_descriptor = {
-    .bLength = sizeof(configuration_descriptor_t),
+    .bLength = sizeof configuration_descriptor,
     .bDescriptorType = CONFIGURATION_DESCRIPTOR,
-    .wTotalLength =
-        sizeof(configuration_descriptor_t), // TODO calculate properly!
+    .wTotalLength = sizeof configuration_descriptor, // TODO calculate properly!
     .bNumInterfaces = 0,
     .bConfigurationValue = 1,
     .iConfiguration = 1,
@@ -36,7 +35,7 @@ configuration_descriptor_t configuration_descriptor = {
 
 // 3.6 Interface Association Descriptor
 interface_association_descriptor_t interface_association_descriptor = {
-    .bLength = sizeof(interface_association_descriptor_t),
+    .bLength = sizeof interface_association_descriptor,
     .bDescriptorType = INTERFACE_ASSOCIATION_DESCRIPTOR,
     .bFirstInterface = 0,
     .bInterfaceCount = 2,
@@ -48,7 +47,7 @@ interface_association_descriptor_t interface_association_descriptor = {
 
 // 3.7.1 Standard VC Interface Descriptor
 interface_descriptor_t video_control_interface_descriptor = {
-    .bLength = sizeof(interface_descriptor_t),
+    .bLength = sizeof video_control_interface_descriptor,
     .bDescriptorType = INTERFACE_DESCRIPTOR,
     .bInterfaceNumber = 0,
     .bAlternateSetting = 0,
@@ -62,7 +61,7 @@ interface_descriptor_t video_control_interface_descriptor = {
 // 3.7.2 Class-Specific VC Interface Descriptor
 video_control_interface_descriptor_header_t
     video_control_interface_descriptor_header = {
-        .bLength = sizeof(video_control_interface_descriptor_header_t),
+        .bLength = sizeof video_control_interface_descriptor_header,
         .bDescriptorType = CS_INTERFACE,
         .bDescriptorSubType = VC_HEADER,
         .bcdUVC = 0x150,
@@ -70,6 +69,38 @@ video_control_interface_descriptor_header_t
         .dwClockFrequency = F_CPU,
         .bInCollection = 1,
         .baInterfaceNr = {1},
+};
+
+// 3.7.2.3 Camera Terminal Descriptor
+camera_terminal_descriptor_t camera_terminal_descriptor = {
+    .bLength = sizeof camera_terminal_descriptor,
+    .bDescriptorType = CS_INTERFACE,
+    .bDescriptorSubType = VC_OUTPUT_TERMINAL,
+    .bTerminalID = 1,
+    .wTerminalType = ITT_CAMERA,
+    .bAssocTerminal = 2,
+    .iTerminal = 1,
+    .wObjectiveFocalLengthMin = 0,
+    .wObjectiveFocalLengthMax = 0,
+    .wOcularFocalLength = 0,
+    .bControlSize = sizeof camera_terminal_descriptor.bControlSize,
+    .bmControls =
+        {
+            0,
+            0,
+            0,
+        },
+};
+
+streaming_terminal_descriptor_t streaming_terminal_descriptor = {
+    .bLength = sizeof streaming_terminal_descriptor,
+    .bDescriptorType = CS_INTERFACE,
+    .bDescriptorSubType = VC_OUTPUT_TERMINAL,
+    .bTerminalID = 3,
+    .wTerminalType = TT_STREAMING,
+    .bAssocTerminal = 0,
+    .bSourceID = 1,
+    .iTerminal = 1,
 };
 
 string_descriptor_t string_descriptor_zero = {

@@ -13,6 +13,10 @@ extern interface_descriptor_t video_control_interface_descriptor;
 extern video_control_interface_descriptor_header_t
     video_control_interface_descriptor_header;
 
+extern camera_terminal_descriptor_t camera_terminal_descriptor;
+
+extern streaming_terminal_descriptor_t streaming_terminal_descriptor;
+
 extern string_descriptor_t string_descriptor_zero;
 
 extern string_descriptor_t string_descriptor_one;

@@ -125,6 +125,32 @@ typedef struct USB_STRUCT {
 typedef struct USB_STRUCT {
   uint8_t bLength;
   uint8_t bDescriptorType;
+  uint8_t bDescriptorSubType;
+  uint8_t bTerminalID;
+  uint16_t wTerminalType;
+  uint8_t bAssocTerminal;
+  uint8_t iTerminal;
+  uint16_t wObjectiveFocalLengthMin;
+  uint16_t wObjectiveFocalLengthMax;
+  uint16_t wOcularFocalLength;
+  uint8_t bControlSize;
+  uint8_t bmControls[3];
+} camera_terminal_descriptor_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bDescriptorSubType;
+  uint8_t bTerminalID;
+  uint16_t wTerminalType;
+  uint8_t bAssocTerminal;
+  uint8_t bSourceID;
+  uint8_t iTerminal;
+} streaming_terminal_descriptor_t;
+
+typedef struct USB_STRUCT {
+  uint8_t bLength;
+  uint8_t bDescriptorType;
   struct {
     uint8_t number : 4;
     uint8_t _ : 3;
@@ -332,4 +358,21 @@ enum {
   VS_GENERATE_KEY_FRAME_CONTROL = 0x07,
   VS_UPDATE_FRAME_SEGMENT_CONTROL = 0x08,
   VS_SYNCH_DELAY_CONTROL = 0x09,
+  // Appendix B. Terminal Types
+  // B.1. USB Terminal Types
+  TT_VENDOR_SPECIFIC = 0x0100,
+  TT_STREAMING = 0x0101,
+  // B.2. Input Terminal Types
+  ITT_VENDOR_SPECIFIC = 0x0200,
+  ITT_CAMERA = 0x0201,
+  ITT_MEDIA_TRANSPORT_INPUT = 0x0202,
+  // B.3. Output Terminal Types
+  OTT_VENDOR_SPECIFIC = 0x0300,
+  OTT_DISPLAY = 0x0301,
+  OTT_MEDIA_TRANSPORT_OUTPUT = 0x0302,
+  // B.4. External Terminal Types
+  EXTERNAL_VENDOR_SPECIFIC = 0x0400,
+  COMPOSITE_CONNECTOR = 0x0401,
+  SVIDEO_CONNECTOR = 0x0402,
+  COMPONENT_CONNECTOR = 0x0403,
 };
