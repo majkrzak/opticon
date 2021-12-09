@@ -106,8 +106,8 @@ static void _control_get_descriptor(uint16_t wValue, uint16_t wLength) {
                    sizeof device_descriptor, wLength, 32);
     break;
   case CONFIGURATION_DESCRIPTOR:
-    _data_transmit((const uint8_t *)&configuration_descriptor,
-                   sizeof configuration_descriptor, wLength, 32);
+    _data_transmit((const uint8_t *)&configuration_descriptor_bundle,
+                   sizeof configuration_descriptor_bundle, wLength, 32);
     break;
   case STRING_DESCRIPTOR:
     switch (descriptor.t.index) {
