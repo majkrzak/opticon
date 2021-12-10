@@ -255,6 +255,38 @@ typedef struct USB_STRUCT {
   uint16_t bString[];
 } string_descriptor_t;
 
+typedef struct USB_STRUCT {
+  struct {
+    on_off_t fixed_dwFrameInterval : 1;
+    on_off_t fixed_wKeyFrameRate : 1;
+    on_off_t fixed_wPFrameRate : 1;
+    on_off_t fixed_wCompQuality : 1;
+    on_off_t fixed_wCompWindowSize : 1;
+    uint16_t _ : 11;
+  } bmHint;
+  uint8_t bFormatIndex;
+  uint8_t bFrameIndex;
+  uint32_t dwFrameInterval;
+  uint16_t wKeyFrameRate;
+  uint16_t wPFrameRate;
+  uint16_t wCompQuality;
+  uint16_t wCompWindowSize;
+  uint16_t wDelay;
+  uint32_t dwMaxVideoFrameSize;
+  uint32_t dwMaxPayloadTransferSize;
+  uint32_t dwClockFrequency;
+  uint8_t bmFramingInfo; // TODO extend
+  uint8_t bPreferedVersion;
+  uint8_t bMinVersion;
+  uint8_t bMaxVersion;
+  uint8_t bUsage;
+  uint8_t bBitDepthLuma;
+  uint8_t bmSettings;
+  uint8_t bMaxNumberOfRefFramesPlus1;
+  uint16_t bmRateControlModes;
+  uint8_t bmLayoutPerStream[8];
+} video_probe_controls_t;
+
 enum {
   CC_MISCELLANEOUS = 0xEF,
   SC_COMMON_CLASS = 0x02,

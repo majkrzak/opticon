@@ -35,3 +35,5 @@ extern configuration_descriptor_bundle_t configuration_descriptor_bundle;
 extern string_descriptor_t string_descriptor_zero;
 
 extern string_descriptor_t string_descriptor_one;
+
+extern video_probe_controls_t video_probe_controls;

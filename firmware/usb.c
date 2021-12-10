@@ -141,6 +141,32 @@ static void _control_get_configuration(uint16_t wLength) {
   _data_transmit((uint8_t[]){1}, 1, wLength, 32);
 }
 
+static void _control_video_get_def(uint16_t wValue, uint16_t wLength) {
+  switch (wValue >> 8) {
+  case VS_PROBE_CONTROL:
+    _data_transmit((const uint8_t *)&video_probe_controls,
+                   sizeof video_probe_controls, wLength, 32);
+    break;
+  default:
+    _control_is_ok = false;
+  };
+}
+
+static void _control_video_get_cur(uint16_t wValue, uint16_t wLength) {
+  switch (wValue >> 8) {
+  case VS_PROBE_CONTROL:
+    _data_transmit((const uint8_t *)&video_probe_controls,
+                   sizeof video_probe_controls, wLength, 32);
+    break;
+  default:
+    _control_is_ok = false;
+  };
+}
+
+static void _control_video_set_cur(uint16_t) {
+  // TODO: receive data
+}
+
 static void _control_setup() {
   _select_endpoint(0);
 
@@ -159,18 +185,45 @@ static void _control_setup() {
     break;
   }
 
-  switch (request.t.bRequest) {
-  case GET_DESCRIPTOR:
-    _control_get_descriptor(request.t.wValue, request.t.wLength);
+  switch (request.t.bmRequestType.recipient) {
+  case DEVICE:
+    switch (request.t.bRequest) {
+    case GET_DESCRIPTOR:
+      _control_get_descriptor(request.t.wValue, request.t.wLength);
+      break;
+    case SET_ADDRESS:
+      _control_set_address(request.t.wValue);
+      break;
+    case SET_CONFIGURATION:
+      _control_set_configuration(request.t.wValue);
+      break;
+    case GET_CONFIGURATION:
+      _control_get_configuration(request.t.wLength);
+      break;
+    default:
+      _control_is_ok = false;
+    }
     break;
-  case SET_ADDRESS:
-    _control_set_address(request.t.wValue);
-    break;
-  case SET_CONFIGURATION:
-    _control_set_configuration(request.t.wValue);
-    break;
-  case GET_CONFIGURATION:
-    _control_get_configuration(request.t.wLength);
+  case INTERFACE:
+    switch (request.t.wIndex) {
+    case 0x01: // Video Streaming Interface
+      switch ((int)request.t.bRequest) {
+      case GET_DEF:
+        _control_video_get_def(request.t.wValue, request.t.wLength);
+        break;
+      case GET_CUR:
+        _control_video_get_cur(request.t.wValue, request.t.wLength);
+        break;
+      case SET_CUR:
+        _control_video_set_cur(request.t.wValue);
+        break;
+      default:
+        _control_is_ok = false;
+      }
+      break;
+    default:
+      _control_is_ok = false;
+    }
     break;
   default:
     _control_is_ok = false;
