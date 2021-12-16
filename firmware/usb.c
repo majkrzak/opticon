@@ -206,6 +206,9 @@ static void _control_setup() {
   switch (request.t.bmRequestType.recipient) {
   case DEVICE:
     switch (request.t.bRequest) {
+    case GET_STATUS:
+      _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
+      break;
     case GET_DESCRIPTOR:
       _control_get_descriptor(request.t.wValue, request.t.wLength);
       break;
@@ -226,6 +229,9 @@ static void _control_setup() {
     switch (request.t.wIndex) {
     case 0x01: // Video Streaming Interface
       switch ((int)request.t.bRequest) {
+      case GET_STATUS:
+        _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
+        break;
       case GET_DEF:
         _control_video_get_def(request.t.wValue, request.t.wLength);
         break;
@@ -238,6 +244,15 @@ static void _control_setup() {
       default:
         _control_is_ok = false;
       }
+      break;
+    default:
+      _control_is_ok = false;
+    }
+    break;
+  case ENDPOINT:
+    switch ((int)request.t.bRequest) {
+    case GET_STATUS:
+      _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
       break;
     default:
       _control_is_ok = false;
