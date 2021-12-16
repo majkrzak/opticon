@@ -78,7 +78,13 @@ static void _wait_TXINI() { loop_until_bit_is_set(UEINTX, TXINI); }
 
 static void _clear_TXINI() { UEINTX &= ~(1 << TXINI); }
 
-static void _clear_RXSTPI() { UEINTX &= ~(1 << RXSTPI); }
+static void _wait_RXOUTI() { loop_until_bit_is_set(UEINTX, RXOUTI); }
+
+static void _clear_RXOUTI() { UEINTX &= ~(1 << RXOUTI); }
+
+static void _clear_RXSTPI() {
+  UEINTX &= ~((1 << RXSTPI) | (1 << RXOUTI) | (1 << TXINI));
+}
 
 static void _data_transmit(const uint8_t *buff, size_t len, size_t max_len,
                            size_t chunk_len) {
@@ -87,6 +93,17 @@ static void _data_transmit(const uint8_t *buff, size_t len, size_t max_len,
     UEDATX = *it;
     if (!(((it - buff) + 1) % chunk_len))
       _clear_TXINI();
+  }
+}
+
+static void _data_receive(uint8_t *buff, size_t len, size_t max_len,
+                          size_t chunk_len) {
+  for (uint8_t *it = buff; it < buff + len && it < buff + max_len; ++it) {
+    _wait_RXOUTI();
+    *it = UEDATX;
+    if (!(((it - buff) + 1) % chunk_len) || it + 1 == buff + len ||
+        it + 1 == buff + max_len)
+      _clear_RXOUTI();
   }
 }
 
@@ -163,8 +180,9 @@ static void _control_video_get_cur(uint16_t wValue, uint16_t wLength) {
   };
 }
 
-static void _control_video_set_cur(uint16_t) {
-  // TODO: receive data
+static void _control_video_set_cur(uint16_t, uint16_t wLength) {
+  uint8_t buff[wLength];
+  _data_receive(buff, sizeof buff, wLength, 32);
 }
 
 static void _control_setup() {
@@ -215,7 +233,7 @@ static void _control_setup() {
         _control_video_get_cur(request.t.wValue, request.t.wLength);
         break;
       case SET_CUR:
-        _control_video_set_cur(request.t.wValue);
+        _control_video_set_cur(request.t.wValue, request.t.wLength);
         break;
       default:
         _control_is_ok = false;
