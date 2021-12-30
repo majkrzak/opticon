@@ -9,14 +9,12 @@ int main() {
 
   uart_init();
 
-  log_line("\n\n");
-
   usb_init();
 
-  log_line("System initialized");
+  _delay_ms(500);
 
   while (1) {
-    _delay_ms(500);
+    _delay_ms(100);
   }
 
   return 0;

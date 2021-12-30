@@ -1,4 +1,5 @@
 #include "usb.h"
+#include "usb_config.h"
 #include "usb_descriptors.h"
 #include "usb_types.h"
 
@@ -10,6 +11,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <util/delay.h>
 
 static void _init_pll() {
   PLLCSR = (F_CPU == 16000000UL ? (1 << PINDIV) : 0) | (1 << PLLE);
@@ -17,14 +19,25 @@ static void _init_pll() {
 }
 
 static void _init_control_endpoint() {
-  UENUM = 0;
+  UENUM = CONTROL_ENDPOINT;
   UECONX = (1 << EPEN);
   UECFG0X = (0b00 << EPTYPE0) | (0 << EPDIR);
   UECFG1X = (0b010 << EPSIZE0) | (0b00 << EPBK0) | (1 << ALLOC);
   assert(bit_is_set(UESTA0X, CFGOK));
-  UERST = 1;
+  UERST = 1 << CONTROL_ENDPOINT;
   UERST = 0;
   UEIENX = (1 << RXSTPE);
+}
+
+static void _init_video_streaming_endpoint() {
+  UENUM = VIDEO_STREAMING_ENDPOINT;
+  UECONX = (1 << EPEN);
+  UECFG0X = (0b10 << EPTYPE0) | (1 << EPDIR);
+  UECFG1X = (0b010 << EPSIZE0) | (0b00 << EPBK0) | (1 << ALLOC);
+  assert(bit_is_set(UESTA0X, CFGOK));
+  UERST = 1 << VIDEO_STREAMING_ENDPOINT;
+  UERST = 0;
+  UEIENX = (1 << TXINE);
 }
 
 void usb_init() {
@@ -53,6 +66,7 @@ ISR(USB_GEN_vect) {
   if (bit_is_set(UDINT, EORSTI)) {
     // log_line("EORSTI - End Of Reset Interrupt");
     _init_control_endpoint();
+    _init_video_streaming_endpoint();
   }
   if (bit_is_set(UDINT, SOFI)) {
     // log_line("SOFI - Start Of Frame Interrupt");
@@ -85,6 +99,10 @@ static void _clear_RXOUTI() { UEINTX &= ~(1 << RXOUTI); }
 static void _clear_RXSTPI() {
   UEINTX &= ~((1 << RXSTPI) | (1 << RXOUTI) | (1 << TXINI));
 }
+
+static void _clear_FIFOCON() { UEINTX &= ~(1 << FIFOCON); }
+
+static bool _read_write_allowed() { return bit_is_set(UEINTX, RWAL); }
 
 static void _data_transmit(const uint8_t *buff, size_t len, size_t max_len,
                            size_t chunk_len) {
@@ -153,7 +171,10 @@ static void _control_set_address(uint16_t wValue) {
   UDADDR = wValue | (1 << ADDEN);
 }
 
-static void _control_set_configuration(uint16_t) {}
+static void _control_set_configuration(uint16_t) {
+  //_init_video_streaming_endpoint();
+  //_select_endpoint(CONTROL_ENDPOINT);
+}
 static void _control_get_configuration(uint16_t wLength) {
   _data_transmit((uint8_t[]){1}, 1, wLength, 32);
 }
@@ -180,13 +201,35 @@ static void _control_video_get_cur(uint16_t wValue, uint16_t wLength) {
   };
 }
 
+static void _control_video_get_min(uint16_t wValue, uint16_t wLength) {
+  switch (wValue >> 8) {
+  case VS_PROBE_CONTROL:
+    _data_transmit((const uint8_t *)&video_probe_controls,
+                   sizeof video_probe_controls, wLength, 32);
+    break;
+  default:
+    _control_is_ok = false;
+  };
+}
+
+static void _control_video_get_max(uint16_t wValue, uint16_t wLength) {
+  switch (wValue >> 8) {
+  case VS_PROBE_CONTROL:
+    _data_transmit((const uint8_t *)&video_probe_controls,
+                   sizeof video_probe_controls, wLength, 32);
+    break;
+  default:
+    _control_is_ok = false;
+  };
+}
+
 static void _control_video_set_cur(uint16_t, uint16_t wLength) {
   uint8_t buff[wLength];
   _data_receive(buff, sizeof buff, wLength, 32);
 }
 
 static void _control_setup() {
-  _select_endpoint(0);
+  _select_endpoint(CONTROL_ENDPOINT);
 
   setup_request request;
   _read(request.b, sizeof request);
@@ -207,7 +250,7 @@ static void _control_setup() {
   case DEVICE:
     switch (request.t.bRequest) {
     case GET_STATUS:
-      _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
+      _data_transmit((uint8_t[]){0, 0}, 2, request.t.wLength, 32);
       break;
     case GET_DESCRIPTOR:
       _control_get_descriptor(request.t.wValue, request.t.wLength);
@@ -230,7 +273,7 @@ static void _control_setup() {
     case 0x01: // Video Streaming Interface
       switch ((int)request.t.bRequest) {
       case GET_STATUS:
-        _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
+        _data_transmit((uint8_t[]){0, 0}, 2, request.t.wLength, 32);
         break;
       case GET_DEF:
         _control_video_get_def(request.t.wValue, request.t.wLength);
@@ -238,8 +281,18 @@ static void _control_setup() {
       case GET_CUR:
         _control_video_get_cur(request.t.wValue, request.t.wLength);
         break;
+      case GET_MIN:
+        _control_video_get_min(request.t.wValue, request.t.wLength);
+        break;
+      case GET_MAX:
+        _control_video_get_max(request.t.wValue, request.t.wLength);
+        break;
       case SET_CUR:
         _control_video_set_cur(request.t.wValue, request.t.wLength);
+        break;
+      case SET_INTERFACE:
+        UERST = 1 << VIDEO_STREAMING_ENDPOINT;
+        UERST = 0;
         break;
       default:
         _control_is_ok = false;
@@ -250,14 +303,22 @@ static void _control_setup() {
     }
     break;
   case ENDPOINT:
+    //     switch (request.t.wIndex) {
+    //     case (0x80 & VIDEO_STREAMING_ENDPOINT)<<8:
     switch ((int)request.t.bRequest) {
     case GET_STATUS:
-      _data_transmit((uint8_t[]){2}, 2, request.t.wLength, 32);
+      _data_transmit((uint8_t[]){0, 0}, 2, request.t.wLength, 32);
+      break;
+    case CLEAR_FEATURE:
       break;
     default:
       _control_is_ok = false;
     }
     break;
+    //     default:
+    //       _control_is_ok = false;
+    //     }
+    //     break;
   default:
     _control_is_ok = false;
   }
@@ -270,11 +331,58 @@ static void _control_setup() {
 }
 
 static bool _is_control_setup() {
-  return bit_is_set(UEINT, EPINT0) && bit_is_set(UEINTX, RXSTPI);
+  if (bit_is_set(UEINT, EPINT0)) {
+    _select_endpoint(CONTROL_ENDPOINT);
+    if (bit_is_set(UEINTX, RXSTPI)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static size_t _video_streaming_byte_idx = 0;
+static size_t _video_streaming_frame_idx = 0;
+
+static void _video_streaming() {
+  _clear_TXINI();
+  while (bit_is_set(UEINTX, RWAL) &&
+         _video_streaming_byte_idx != (16 * 16 + 2)) {
+    switch (_video_streaming_byte_idx++) {
+    case 0:
+      UEDATX = 2;
+      break;
+    case 1:
+      UEDATX = 0b10000000 | (_video_streaming_frame_idx % 2);
+      break;
+    default:
+      UEDATX = (_video_streaming_byte_idx - 1 == _video_streaming_frame_idx)
+                   ? 255
+                   : 0;
+      break;
+    }
+  }
+  if (_video_streaming_byte_idx == (16 * 16 + 2)) {
+    _video_streaming_frame_idx += 1;
+    _video_streaming_frame_idx %= 16 * 16;
+    _video_streaming_byte_idx = 0;
+  }
+  _clear_FIFOCON();
+}
+
+static bool _is_video_streaming() {
+  if (bit_is_set(UEINT, EPINT1)) {
+    _select_endpoint(VIDEO_STREAMING_ENDPOINT);
+    if (bit_is_set(UEINTX, TXINI)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 ISR(USB_COM_vect) {
   if (_is_control_setup()) {
     _control_setup();
+  } else if (_is_video_streaming()) {
+    _video_streaming();
   }
 }

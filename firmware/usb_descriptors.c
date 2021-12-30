@@ -30,7 +30,7 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
             .bNumInterfaces = 2,
             .bConfigurationValue = 1,
             .iConfiguration = 1,
-            .bmAttributes = 0,
+            .bmAttributes = 0x80,
             .bMaxPower = 250,
         },
     .interface_association_descriptor =
@@ -166,10 +166,10 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                     .bNumFrameDescriptors = 1,
                     .guidFormat =
                         {
-                            0x59,
-                            0x55,
-                            0x59,
-                            0x32,
+                            'Y',
+                            '8',
+                            ' ',
+                            ' ',
                             0x00,
                             0x00,
                             0x10,
@@ -207,7 +207,7 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                     .wHeight = 16,
                     .dwMinBitRate = 512ul * 512ul, // TODO calculate
                     .dwMaxBitRate = 512ul * 512ul,
-                    .dwMaxVideoFrameBufferSize = 16 * 16 * 3,
+                    .dwMaxVideoFrameBufferSize = 16 * 16,
                     .dwDefaultFrameInterval = 1000000,
                     .bFrameIntervalType = 0,
                     .dwMinFrameInterval = 1000000,
@@ -227,10 +227,12 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                         },
                     .bmAttributes =
                         {
-                            .transfer_type = BULK,
+                            .transfer_type = BULK, // ISOCHRONOUS,
+                            //                             .synchronisation_type
+                            //                             = ASYNCHRONOUS,
                         },
-                    .wMaxPacketSize = 64, // TODO fixme
-                    .bInterval = 100,
+                    .wMaxPacketSize = 32, // TODO fixme
+                    .bInterval = 1,
                 },
         },
 };
@@ -277,8 +279,8 @@ video_probe_controls_t video_probe_controls = {
     .wCompQuality = 0,
     .wCompWindowSize = 0,
     .wDelay = 0,
-    .dwMaxVideoFrameSize = 0,
-    .dwMaxPayloadTransferSize = 0,
+    .dwMaxVideoFrameSize = 16 * 16,
+    .dwMaxPayloadTransferSize = 16 * 16 + 2,
     .dwClockFrequency = 0,
     .bmFramingInfo = 0,
     .bPreferedVersion = 0,
