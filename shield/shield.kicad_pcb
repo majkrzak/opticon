@@ -5,6 +5,13 @@
   )
 
   (paper "A5")
+  (title_block
+    (title "ὀπτικός 8x6 arduino shield")
+    (date "2022-01-02")
+    (rev "1")
+    (company "Piotr Majkrzak")
+  )
+
   (layers
     (0 "F.Cu" signal)
     (31 "B.Cu" signal)
@@ -3420,6 +3427,9 @@
   (gr_line (start 135.89 33.02) (end 137.16 34.29) (layer "Edge.Cuts") (width 0.05) (tstamp fb126c26-740a-4781-a5dd-5ef5455e4878))
   (gr_text "ὀπτικός" (at 106.045 80.645) (layer "F.SilkS") (tstamp 7d3ce60b-0fbc-4d1c-8ad6-57910cd4368e)
     (effects (font (size 2.5 2.5) (thickness 0.5)))
+  )
+  (gr_text "ὀπτικός 8x6 arduino shield\nhttps://github.com/majkrzak/optikos\nDate: 2022-01-02 Rev: 1" (at 123.825 81.28) (layer "F.SilkS") (tstamp c7db6f12-37a4-4f57-ae11-a85dc3d9a3a4)
+    (effects (font (size 0.5 0.5) (thickness 0.125)) (justify left))
   )
 
   (segment (start 80.645 39.37) (end 88.265 39.37) (width 0.2286) (layer "B.Cu") (net 3) (tstamp 02289c61-13df-495e-a809-03e3a71bb201))

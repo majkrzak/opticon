@@ -4,6 +4,13 @@
 
   (paper "A4")
 
+  (title_block
+    (title "ὀπτικός 8x6 arduino shield")
+    (date "2022-01-02")
+    (rev "1")
+    (company "Piotr Majkrzak")
+  )
+
   (lib_symbols
     (symbol "Analog_Switch:CD4051B" (in_bom yes) (on_board yes)
       (property "Reference" "U" (id 0) (at -10.16 16.51 0)
