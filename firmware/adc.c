@@ -24,9 +24,9 @@ static uint8_t _map_idx(size_t idx) {
   }
 }
 
-static void _select_mux(size_t idx) { ADMUX = _map_idx(idx); }
+static void _select_channel(size_t idx) { ADMUX = _map_idx(idx); }
 
-static void _start() { ADCSRA |= ADEN; }
+static void _start() { ADCSRA |= (1 << ADSC); }
 
 static uint16_t *_res;
 
@@ -39,6 +39,6 @@ void adc_init() {
 
 void adc_read(size_t idx, uint16_t *res) {
   _res = res;
-  _select_mux(idx);
+  _select_channel(idx);
   _start();
 }

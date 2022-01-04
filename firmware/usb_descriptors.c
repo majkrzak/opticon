@@ -1,6 +1,8 @@
 #include "usb_descriptors.h"
 #include "usb_types.h"
 
+#include "config.h"
+
 #include <stdint.h>
 
 device_descriptor_t device_descriptor = {
@@ -183,7 +185,7 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                             0x9B,
                             0x71,
                         },
-                    .bBitsPerPixel = 8,      // TODO
+                    .bBitsPerPixel = 8,
                     .bDefaultFrameIndex = 0, // TODO dunno
                     .bAspectRatioX = 1,
                     .bAspectRatioY = 1,
@@ -203,11 +205,11 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                             .still_image_supported = OFF,
                             .fixed_frame_rate = ON,
                         },
-                    .wWidth = 16,
-                    .wHeight = 16,
+                    .wWidth = WIDTH,
+                    .wHeight = HEIGHT,
                     .dwMinBitRate = 512ul * 512ul, // TODO calculate
                     .dwMaxBitRate = 512ul * 512ul,
-                    .dwMaxVideoFrameBufferSize = 16 * 16,
+                    .dwMaxVideoFrameBufferSize = WIDTH * HEIGHT,
                     .dwDefaultFrameInterval = 1000000,
                     .bFrameIntervalType = 0,
                     .dwMinFrameInterval = 1000000,
@@ -231,7 +233,7 @@ configuration_descriptor_bundle_t configuration_descriptor_bundle = {
                             //                             .synchronisation_type
                             //                             = ASYNCHRONOUS,
                         },
-                    .wMaxPacketSize = 32, // TODO fixme
+                    .wMaxPacketSize = 32,
                     .bInterval = 1,
                 },
         },
@@ -279,8 +281,8 @@ video_probe_controls_t video_probe_controls = {
     .wCompQuality = 0,
     .wCompWindowSize = 0,
     .wDelay = 0,
-    .dwMaxVideoFrameSize = 16 * 16,
-    .dwMaxPayloadTransferSize = 16 * 16 + 2,
+    .dwMaxVideoFrameSize = WIDTH * HEIGHT,
+    .dwMaxPayloadTransferSize = WIDTH * HEIGHT + 2,
     .dwClockFrequency = 0,
     .bmFramingInfo = 0,
     .bPreferedVersion = 0,
