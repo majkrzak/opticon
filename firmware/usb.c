@@ -346,26 +346,30 @@ static size_t _video_streaming_byte_idx = 0;
 static size_t _video_streaming_frame_idx = 0;
 
 static void _video_streaming() {
+
   _clear_TXINI();
-  while (bit_is_set(UEINTX, RWAL) &&
-         _video_streaming_byte_idx != (WIDTH * HEIGHT + 2)) {
-    switch (_video_streaming_byte_idx) {
-    case 0:
-      UEDATX = 2;
-      break;
-    case 1:
-      UEDATX = 0b10000000 | (_video_streaming_frame_idx % 2);
-      break;
-    default:
-      UEDATX = frame[_video_streaming_byte_idx - 2] >> 2;
-      break;
+  if (frame_ready) {
+    while (bit_is_set(UEINTX, RWAL) &&
+           _video_streaming_byte_idx != (WIDTH * HEIGHT + 2)) {
+      switch (_video_streaming_byte_idx) {
+      case 0:
+        UEDATX = 2;
+        break;
+      case 1:
+        UEDATX = 0b10000010 | (_video_streaming_frame_idx % 2);
+        break;
+      default:
+        UEDATX = frame[_video_streaming_byte_idx - 2] >> 2;
+        break;
+      }
+      _video_streaming_byte_idx += 1;
     }
-    _video_streaming_byte_idx += 1;
-  }
-  if (_video_streaming_byte_idx == (WIDTH * HEIGHT + 2)) {
-    _video_streaming_frame_idx += 1;
-    _video_streaming_frame_idx %= WIDTH * HEIGHT;
-    _video_streaming_byte_idx = 0;
+    if (_video_streaming_byte_idx == (WIDTH * HEIGHT + 2)) {
+      frame_ready = false;
+      _video_streaming_frame_idx += 1;
+      _video_streaming_frame_idx %= WIDTH * HEIGHT;
+      _video_streaming_byte_idx = 0;
+    }
   }
   _clear_FIFOCON();
 }

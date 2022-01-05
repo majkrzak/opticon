@@ -28,7 +28,8 @@ int main() {
         _delay_ms(1);
       }
     }
-    _delay_ms(100);
+    frame_ready = true;
+    _delay_ms(100 - WIDTH * HEIGHT);
   }
 
   return 0;
