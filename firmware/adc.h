@@ -12,4 +12,4 @@ void adc_init();
  *  Reads value out of the `idx`'th analog pin into the `res`.
  *  Arduino Leonardo pin numbering is used for `idx`
  */
-void adc_read(size_t idx, uint16_t *res);
+void adc_read(size_t idx, uint8_t *res);

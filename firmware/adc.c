@@ -28,16 +28,16 @@ static void _select_channel(size_t idx) { ADMUX = _map_idx(idx); }
 
 static void _start() { ADCSRA |= (1 << ADSC); }
 
-static uint16_t *_res;
+static uint8_t *_res;
 
-ISR(ADC_vect) { *_res = ADC; }
+ISR(ADC_vect) { *_res = ADC >> 2; }
 
 void adc_init() {
   ADCSRA = (1 << ADEN) | (1 << ADIE);
   ADCSRB = 0;
 }
 
-void adc_read(size_t idx, uint16_t *res) {
+void adc_read(size_t idx, uint8_t *res) {
   _res = res;
   _select_channel(idx);
   _start();

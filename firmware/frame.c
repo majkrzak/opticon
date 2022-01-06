@@ -4,5 +4,5 @@
 
 #include "config.h"
 
-uint16_t frame[WIDTH * HEIGHT] = {};
+uint8_t frame[WIDTH * HEIGHT] = {};
 bool frame_ready = false;

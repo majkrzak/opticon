@@ -359,7 +359,7 @@ static void _video_streaming() {
         UEDATX = 0b10000010 | (_video_streaming_frame_idx % 2);
         break;
       default:
-        UEDATX = frame[_video_streaming_byte_idx - 2] >> 2;
+        UEDATX = frame[_video_streaming_byte_idx - 2];
         break;
       }
       _video_streaming_byte_idx += 1;
