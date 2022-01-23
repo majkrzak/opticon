@@ -2,6 +2,7 @@
 #include "config.h"
 #include "frame.h"
 #include "log.h"
+#include "mux.h"
 #include "scanner.h"
 #include "timer.h"
 #include "uart.h"
@@ -14,6 +15,7 @@ int main() {
   uart_init();
   usb_init();
   adc_init();
+  mux_init();
   timer_init();
   scanner_init();
 

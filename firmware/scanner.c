@@ -2,6 +2,7 @@
 
 #include "adc.h"
 #include "frame.h"
+#include "mux.h"
 #include "timer.h"
 
 #include <stdlib.h>
@@ -26,7 +27,7 @@ static void _tick() {
     }
     break;
   case SELECTING_COLUMN:
-    // select_col;
+    mux_select(col);
     _state = SCANNING;
     break;
   case SCANNING:
